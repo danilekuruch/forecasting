@@ -4,7 +4,7 @@ This project performs time series forecasting using the STL (Seasonal and Trend 
 
 ## Installation
 
-1. Clone the repository: `git clone https://github.com/your_username/your_repository.git`
+1. Clone the repository: `git clone https://github.com/danilekuruch/forecasting.git`
 2. Install the required dependencies: `pip install -r requirements.txt`
 
 ## Usage
