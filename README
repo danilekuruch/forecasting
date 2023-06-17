@@ -1,0 +1,27 @@
+# Time Series Forecasting
+
+This project performs time series forecasting using the STL (Seasonal and Trend decomposition using Loess) method.
+
+## Installation
+
+1. Clone the repository: `git clone https://github.com/your_username/your_repository.git`
+2. Install the required dependencies: `pip install -r requirements.txt`
+
+## Usage
+
+1. Ensure you have a CSV file with the time series data.
+2. Run the main script: `python main.py --path path/to/your/data.csv --ts-name NA_Sales --ts-index 0 --ts-length 200 --forecast-steps 6`
+
+## Dependencies
+
+- numpy
+- seaborn
+- pandas
+- scipy
+- matplotlib
+- statsmodels
+- tkinter
+
+## License
+
+This project is licensed under the MIT License. See the [LICENSE](LICENSE) file for details.
