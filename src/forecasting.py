@@ -24,7 +24,7 @@ def log_separator():
 def get_cmd_args():
     """
     Collects command arguments in one dictionary object
-    
+
     Returns:
         dict: a dictionary object, which includes command arguments
     """
@@ -178,7 +178,7 @@ def build_time_series(data_frame, length, index, name):
         time_series_index: Index of the specific time series column in the DataFrame.
         name: Name of the time series.
     """
-    plt.figure(label="Time Series Plot", figsize=(10, 6))
+    plt.figure(label="Time Series Plot", figsize=(12, 2))
     plt.plot(
         data_frame.values[:length, index],
         color="red",
@@ -295,8 +295,9 @@ def main():
     time_serie_index = int(get_or_default(args, "--ts-index", 0))
     time_serie_length = int(get_or_default(args, "--ts-length", 200))
     forecast_steps = int(get_or_default(args, "--forecast-steps", 6))
+    path = get_or_default(args, "--path", None)
 
-    data_frame = read_csv_file(args["--path"], columns=[time_serie_name])
+    data_frame = read_csv_file(path, columns=[time_serie_name])
     data_frame_values = data_frame.values
 
     build_time_series(
