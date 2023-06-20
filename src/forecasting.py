@@ -136,7 +136,34 @@ def u_2(y_actual, y_predicted):
     return np.sqrt(np.sum(np.square(numerator)) / np.sum(np.square(denominator)))
 
 
-def check_stationarity(time_serie, window_size):
+def build_time_series(data_frame, length, index, name):
+    """
+    Builds and plots a time series.
+
+    Args:
+        data_frame: DataFrame containing the data.
+        time_series_length: The length of the processing time series data.
+        time_series_index: Index of the specific time series column in the DataFrame.
+        name: Name of the time series.
+    """
+    plt.figure(label="Time Series Plot")
+    plt.plot(
+        data_frame.values[:length, index],
+        label=name,
+    )
+
+    plt.xlabel("Time")
+    plt.ylabel("Value")
+    plt.title("Time Series")
+    plt.legend()
+
+    log.info("Data frame values:\n%s", data_frame)
+
+    plt.tight_layout()
+    plt.show()
+
+
+def perform_stationarity(time_serie, window_size):
     """
     Computes and plots the rolling mean and standard deviation to assess stationarity.
 
@@ -168,38 +195,10 @@ def check_stationarity(time_serie, window_size):
     plt.show(block=False)
 
 
-def build_time_series(data_frame, length, index, name):
-    """
-    Builds and plots a time series.
-
-    Args:
-        data_frame: DataFrame containing the data.
-        time_series_length: The length of the processing time series data.
-        time_series_index: Index of the specific time series column in the DataFrame.
-        name: Name of the time series.
-    """
-    plt.figure(label="Time Series Plot", figsize=(12, 2))
-    plt.plot(
-        data_frame.values[:length, index],
-        color="red",
-        linewidth=2,
-        label=name,
-    )
-
-    plt.xlabel("Time")
-    plt.ylabel("Value")
-    plt.title("Time Series")
-    plt.legend()
-
-    log.info("Data frame values:\n%s", data_frame)
-
-    plt.tight_layout()
-    plt.show()
-
-
 def perform_stl_decomposition(time_serie, length, index):
     """
-    Performs STL (Seasonal and Trend decomposition using Loess) decomposition on a given time series.
+    Performs STL (Seasonal and Trend decomposition using Loess)
+        decomposition on a given time series.
 
     Args:
         time_series: Array-like object representing the time series data.
@@ -212,14 +211,14 @@ def perform_stl_decomposition(time_serie, length, index):
 
     axs = res_robust.plot().get_axes()
     components = ["trend", "seasonal", "resid"]
-    for ax, component in zip(axs[1:], components):
+    for axes, component in zip(axs[1:], components):
         series = getattr(res_non_robust, component)
         if component == "resid":
-            ax.plot(series, marker="o", linestyle="none")
+            axes.plot(series, marker="o", linestyle="none")
         else:
-            ax.plot(series)
+            axes.plot(series)
             if component == "trend":
-                ax.legend(["Robust", "Non-robust"], frameon=False)
+                axes.legend(["Robust", "Non-robust"], frameon=False)
 
     for name, res in [("Non-robust", res_non_robust), ("Robust", res_robust)]:
         trend_mape = mape(log_time_series, res.trend)
@@ -285,6 +284,57 @@ def perform_stl_forecasting(time_serie, length, index, steps, is_robust):
     plt.show()
 
 
+def check_normality_jarque_bera(data_frame_values, length, index):
+    """
+    Performs the Jarque-Bera to check the normality of data.
+
+    Args:
+        data (list or numpy array): The data to be tested.
+
+    Returns:
+        bool: True if the data follows a normal distribution, False otherwise.
+    """
+    jarque_bera_test = stats.jarque_bera(data_frame_values[:length, index])
+
+    is_normal = jarque_bera_test[1] > 0.05
+
+    log.info(
+        "Testing normality: performs the Jarque-Bera test:\t%s",
+        jarque_bera_test,
+    )
+
+    log.info("Testing normality - result:\t%s", "Normal" if is_normal else "Not normal")
+
+    return is_normal
+
+
+def check_stationarity_dickey_fuller(data_frame_values, length, index):
+    """
+    Performs the Augmented Dickey-Fuller test to check the stationarity of a time series.
+
+    Args:
+        data_frame (pandas DataFrame): The DataFrame object containing the time series data.
+        time_serie_index (int): The index of the time series column in the DataFrame.
+
+    Returns:
+        bool: True if the time series is stationary, False otherwise.
+    """
+    dickey_fuller_test = adfuller(data_frame_values[:length, index])
+
+    is_stationary = dickey_fuller_test[1] < 0.05
+
+    log.info(
+        "Testing stationarity: perform the Augmented Dickey-Fuller test:\t%s",
+        dickey_fuller_test,
+    )
+    log.info(
+        "Testing stationarity - result:\t%s",
+        "Stationary" if is_stationary else "Not stationary",
+    )
+
+    return is_stationary
+
+
 def main():
     """
     Main function for executing the forecasting process.
@@ -313,16 +363,14 @@ def main():
     plt.rc("font", size=13)
 
     log_separator()
-    log.info(
-        "Testing stationarity: Augmented Dickey-Fuller unit root test\n\t%s",
-        adfuller(data_frame_values[:time_serie_length, time_serie_index]),
-    )
-    log.info(
-        "Testing normality: Perform the Jarque-Bera goodness of fit test on sample data\n\t%s",
-        stats.jarque_bera(data_frame_values[:time_serie_length, time_serie_index]),
+
+    check_normality_jarque_bera(data_frame_values, time_serie_length, time_serie_index)
+
+    check_stationarity_dickey_fuller(
+        data_frame_values, time_serie_length, time_serie_index
     )
 
-    check_stationarity(
+    perform_stationarity(
         time_serie=data_frame_values[:time_serie_length, time_serie_index],
         window_size=12,
     )
