@@ -10,17 +10,7 @@ This project performs time series forecasting using the STL (Seasonal and Trend 
 ## Usage
 
 1. Ensure you have a CSV file with the time series data.
-2. Run the main script: `python main.py --path path/to/your/data.csv --ts-name NA_Sales --ts-index 0 --ts-length 200 --forecast-steps 6`
-
-## Dependencies
-
-- numpy
-- seaborn
-- pandas
-- scipy
-- matplotlib
-- statsmodels
-- tkinter
+2. Run the main script: `python main.py --path ../test/Video_Games_Sales_as_at_22_Dec_2016.csv --ts-name NA_Sales --ts-index 0 --ts-length 200 --forecast-steps 5`
 
 ## License
 
